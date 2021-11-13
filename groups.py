@@ -5,56 +5,98 @@ from libqtile.config import Group, EzKey
 
 groupConfig = [
     dict(
+        key='1',
+        params={
+            'label': '1',
+            'name': 'default1',
+        },
+    ),
+    dict(
+        key='2',
+        params={
+            'label': '2',
+            'name': 'default2',
+        },
+    ),
+    dict(
+        key='3',
+        params={
+            'label': '3',
+            'name': 'default3',
+        },
+    ),
+
+    dict(
         key='j',
-        icon='',
-        name='default1',
+        params={
+            'label': '',
+            'name': 'code1',
+        },
     ),
     dict(
         key='k',
-        icon='',
-        name='default2',
+        params={
+            'label': '',
+            'name': 'code2',
+        },
     ),
     dict(
         key='l',
-        icon='',
-        name='default3',
+        params={
+            'label': '',
+            'name': 'code3',
+        },
     ),
 
     dict(
         key='u',
-        icon='',
-        name='dispo',
+        params={
+            'label': '',
+            'name': 'dispo',
+        },
     ),
     dict(
         key='i',
-        icon='',
-        name='organize',
+        params={
+            'label': '',
+            'name': 'organize',
+        },
     ),
     dict(
         key='o',
-        icon='',
-        name='hack',
+        params={
+            'label': '',
+            'name': 'hack',
+        },
     ),
 
     dict(
         key='m',
-        icon='',
-        name='private',
+        params={
+            'label': '',
+            'name': 'private',
+        },
     ),
     dict(
         key='<comma>',
-        icon='',
-        name='windows',
+        params={
+            'label': '',
+            'name': 'windows',
+            'layout': 'max',
+            'exclusive': True
+        },
     ),
     dict(
         key='<period>',
-        icon='',
-        name='chat',
+        params={
+            'label': '',
+            'name': 'chat',
+        },
     ),
 ]
 groups = []
 for conf in groupConfig:
-    group = Group(name=conf['name'], label=conf['icon'])
+    group = Group(**conf['params'])
     groups.append(group)
     keys.extend([
         # mod1 + letter of group = switch to group

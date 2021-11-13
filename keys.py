@@ -1,5 +1,6 @@
 import os
 
+from libqtile import extension
 from libqtile.command import lazy
 from libqtile.config import EzKey, EzClick, EzDrag, KeyChord
 from libqtile.utils import guess_terminal
@@ -15,12 +16,19 @@ modifier_keys = {
     'C': 'control',
 }
 
+
+class Theme:
+    dmenu = {
+
+    }
+
+
 keys = [
     # Switch between windows
-    EzKey("M-<Left>", lazy.layout.previous(), desc="Move focus to left"),
-    EzKey("M-<Right>", lazy.layout.next(), desc="Move focus to right"),
-    EzKey("M-<Down>", lazy.layout.previous(), desc="Move focus down"),
-    EzKey("M-<Up>", lazy.layout.next(), desc="Move focus up"),
+    EzKey("M-<Left>", lazy.layout.left(), desc="Move focus to left"),
+    EzKey("M-<Right>", lazy.layout.right(), desc="Move focus to right"),
+    EzKey("M-<Down>", lazy.layout.down(), desc="Move focus down"),
+    EzKey("M-<Up>", lazy.layout.up(), desc="Move focus up"),
 
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
@@ -54,12 +62,6 @@ keys = [
         lazy.layout.toggle_split(),
         desc="Move window focus to other window"
     ),
-    EzKey(
-        "M-S-<Return>",
-        lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack"
-    ),
-
 
     EzKey(
         "M-<Return>",
@@ -67,18 +69,42 @@ keys = [
         desc="Launch terminal"
     ),
 
-    # Toggle between different layouts as defined below
+
     EzKey(
         "M-w",
         lazy.window.kill(),
+        desc="Kill focused window"
+    ),
+    EzKey(
+        "M-y",
+        lazy.window.toggle_floating(),
         desc="Kill focused window"
     ),
 
     #
     # Qtile specific
     #
+    EzKey('M-c', lazy.run_extension(extension.CommandSet(
+        commands={
+            'configure': 'gtk-launch jetbrains-pycharm-ce.desktop ~/.config/qtile/',
+            'log': 'termite -e "cat ' + home + '/.local/share/qtile/qtile.log" --hold',
+        },
+        **Theme.dmenu))),
+
     EzKey("M-C-r", lazy.restart(), desc="Restart Qtile"),
     EzKey("M-C-q", lazy.shutdown(), desc="Shutdown Qtile"),
+
+    EzKey("M-C-q", lazy.run_extension(extension.CommandSet(
+        commands={
+            'lock': 'gnome-screensaver-command -l',
+            'logout': 'gnome-session-quit --logout --no-prompt',
+            'shutdown': 'gnome-session-quit --power-off',
+            'restart': 'reboot',
+            'reload': 'qtile-cmd -o cmd -f restart',
+        },
+        **Theme.dmenu)),
+        desc='dmenu session manager'),
+
 
     #
     # Change the volume if your keyboard has special volume keys.
@@ -119,7 +145,7 @@ keys = [
         desc="run flameshot"
     ),
     EzKey(
-        "M-s",
+        "M-S-s",
         lazy.spawn("flameshot gui --delay 2000"),
         desc="run flameshot"
     ),
@@ -134,7 +160,7 @@ keys = [
         EzKey("<Down>", lazy.layout.grow_down()),
         EzKey("n", lazy.layout.normalize()),
         EzKey("f", lazy.layout.maximize())],
-        mode="Windows"
+        mode="Resize window"
     ),
 ]
 

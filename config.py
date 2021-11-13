@@ -1,4 +1,3 @@
-
 import os
 import subprocess
 
@@ -9,32 +8,49 @@ from libqtile.config import Match
 
 from keys import keys, mouse
 from groups import groups
-from screens import screens
+from screens import screens, layouts
+
+home = os.path.expanduser('~')
 
 keys = keys
 mouse = mouse
 groups = groups
 screens = screens
+layouts = layouts
 
-shell = True
-dgroups_key_binder = None
-dgroups_app_rules = []  # type: List
-follow_mouse_focus = True
-bring_front_click = True
-cursor_warp = True
+##
+#
+#  Main Config
+#  https://docs.qtile.org/en/latest/manual/config/index.html#configuration-variables
+##
 
+# if window wants fullscreen its get fullscreen
 auto_fullscreen = True
-focus_on_window_activation = "smart"
-reconfigure_screens = True
 
-# If things like steam games want to auto-minimize themselves when losing
-# focus, should we respect this or not?
+# steam games want to auto-minimize themselves when losing focus, should we respect this or not?
 auto_minimize = True
 
-layouts = [
-    layout.Columns(margin=10, border_focus_stack=['#d75f5f', '#8f3d3d'], padding=10, border_width=4),
-    layout.TreeTab(),
-]
+# focus is where my mouse is
+follow_mouse_focus = True
+
+# automatically focus if the window is in the current group
+focus_on_window_activation = "smart"
+
+# focus floating windows on click only,
+# otherwise its possible that floating windows will be sent to back and you don't get it back
+bring_front_click = "floating_only"
+
+# moves cursor to often, every new window also tabs in chrome...
+cursor_warp = False
+
+shell = True
+
+dgroups_key_binder = None
+dgroups_app_rules = []  # type: List
+
+reconfigure_screens = True
+
+
 
 widget_defaults = dict(
     font='JetBrainsMono Nerd Font Mono',
@@ -54,19 +70,31 @@ floating_layout = layout.Floating(float_rules=[
     Match(title='pinentry'),  # GPG key password entry
 ])
 
+@hook.subscribe.startup
+def dbus_register():
+    id = os.environ.get('DESKTOP_AUTOSTART_ID')
+    if not id:
+        return
+    subprocess.Popen(['dbus-send',
+                      '--session',
+                      '--print-reply',
+                      '--dest=org.gnome.SessionManager',
+                      '/org/gnome/SessionManager',
+                      'org.gnome.SessionManager.RegisterClient',
+                      'string:qtile',
+                      'string:' + id])
+
+@hook.subscribe.screen_change
+def restart_on_randr(qtile, ev):
+    qtile.cmd_restart()
+
 
 @hook.subscribe.startup_once
 def autostart():
-    start = os.path.expanduser('sh ~/.config/.autostart/qtile.sh')
+    start = os.path.expanduser(home + '/.autostart/qtile.sh')
     subprocess.call([start])
 
 
-# XXX: Gasp! We're lying here. In fact, nobody really uses or cares about this
-# string besides java UI toolkits; you can see several discussions on the
-# mailing lists, GitHub issues, and other WM documentation that suggest setting
-# this string if your java app doesn't work correctly. We may as well just lie
-# and say that we're a working one by default.
-#
-# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
-# java that happens to be on java's whitelist.
+# nobody really uses or cares about this string besides java UI toolkits
+# LG3D to maximize irony: it is a 3D non-reparenting WM written in java that happens to be on java’s whitelist
 wmname = "LG3D"
